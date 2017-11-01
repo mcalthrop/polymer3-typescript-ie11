@@ -5,13 +5,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Polymer 3, Typescript and IE11 issue</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-    <script src="webcomponents-loader.js"></script>
 </head>
 
 <body>
-    <my-app name="ddd"></my-app>
+    <my-app name="polymer3-typescript-ie11"></my-app>
+
+    <!--
+      Feature detect Custom Elements support. If the browser DOES support Custom
+      Elements then we need to load the custom-elements-es5-adapter because
+      our project code has been transpiled from ES2015 to ES5 and native Custom
+      Elements expect elements will be registered as classes.
+    -->
+    <div id="ce-es5-shim">
+        <script type="text/javascript">
+            if (!window.customElements) {
+                var ceShimContainer = document.querySelector('#ce-es5-shim');
+                ceShimContainer.parentElement.removeChild(ceShimContainer);
+            }
+        </script>
+    </div>
+
+    <!--
+        Use the webcomponents-loader script which will feature detect which Web
+        Components features are missing and lazy load the appropriate polyfills.
+        When we hear the 'WebComponentsReady' event from the polyfill bundle we can
+        insert our 'bundle.js'.
+      -->
+    <script>
+        // Force all polyfills on
+        if (window.customElements) {
+            window.customElements.forcePolyfill = true;
+        }
+        ShadyDOM = { force: true };
+        ShadyCSS = { shimcssproperties: true };
+    </script>
+    <!--
+        IMPORTANT: Make sure you set the inject: false option in HTMLWebpackPlugin
+        so it doesn't try to insert bundle.js. We're handling loading it ourselves
+        up above.
+      -->
 </body>
 
 </html>
